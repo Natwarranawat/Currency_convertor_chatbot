@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter Bot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Currency Converter</h1>
+            <p>Convert currencies quickly and easily.</p>
+        </header>
+
+        <section class="converter-form">
+            <form id="converterForm">
+                <div class="input-group">
+                    <label for="amount">Amount:</label>
+                    <input type="number" id="amount" name="amount" placeholder="Enter amount" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="from_currency">From:</label>
+                    <select id="from_currency" name="from_currency">
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="to_currency">To:</label>
+                    <select id="to_currency" name="to_currency">
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="animated-button">Convert</button>
+            </form>
+
+            <!-- Result Section -->
+            <div id="result" class="result-box" style="display:none;">
+                <h2>Converted Amount:</h2>
+                <p id="conversionResult"></p>
+            </div>
+        </section>
+
+        <!-- Chatbot Embed -->
+        <section class="chatbot">
+            <h2>Chat with our Bot!</h2>
+            <iframe allow="microphone;" width="350" height="430" 
+                src="https://console.dialogflow.com/api-client/demo/embedded/6c6f26f1-2f1c-4f03-86fa-65beceeb128a">
+            </iframe>
+        </section>
+    </div>
+
+    <!-- JavaScript to handle form submission and display the result -->
+    <script>
+        $(document).ready(function() {
+            $('#converterForm').on('submit', function(e) {
+                e.preventDefault();
+
+                // Get form data
+                const amount = $('#amount').val();
+                const from_currency = $('#from_currency').val();
+                const to_currency = $('#to_currency').val();
+
+                // Send data to the server via AJAX
+                $.ajax({
+                    url: '/convert',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        amount: amount,
+                        from_currency: from_currency,
+                        to_currency: to_currency
+                    }),
+                    success: function(response) {
+                        // Display the conversion result
+                        if (response.error) {
+                            $('#conversionResult').text(response.error);
+                        } else {
+                            $('#conversionResult').text(response.message);
+                        }
+                        $('#result').show();
+                    },
+                    error: function() {
+                        $('#conversionResult').text('Error converting currency.');
+                        $('#result').show();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
